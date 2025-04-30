@@ -22,6 +22,23 @@
             line-height: 1.5;
         }
     </style>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
+        authDomain: "riims-45a22.firebaseapp.com",
+        projectId: "riims-45a22",
+        storageBucket: "riims-45a22.appspot.com",
+        messagingSenderId: "65833594122",
+        appId: "1:65833594122:web:7ef63f955aff3bbd09def3",
+        measurementId: "G-HH550FMYZQ"
+      };
+      window.firebaseApp = initializeApp(firebaseConfig);
+      window.db = getFirestore(window.firebaseApp);
+    </script>
 </head>
 <body>
     <!-- Navbar -->
@@ -37,7 +54,7 @@
         </ul>
         <div class="navbar-right">
             <span id="doctor-credentials"></span>
-            <button class="logout-btn" id="logout-btn" onclick="logout()">Logout</button>
+            <button class="logout-btn" id="logout-btn">Logout</button>
         </div>
     </nav>
 
@@ -59,15 +76,15 @@
             <select id="subsystem-select">
                 <option value="">Select Subsystem</option>
             </select>
-            <button class="btn" onclick="submitAssignment()">Submit</button>
+            <button class="btn" id="assignment-submit-btn">Submit</button>
             <div id="success-message"></div>
         </div>
     </section>
 
-    <script src="script.js"></script>
-    <script>
+    <!-- Systems Data and Script -->
+    <script type="module">
         // Systems data
-        const systems = [
+        window.systems = [
             {id: 1, name: "Respiratory Medicine (Pulmo)", subsystems: ["RICU", "TB and exam ward", "OP", "Casualty"]},
             {id: 2, name: "Pediatrics", subsystems: ["Wards", "PICU", "OP"]},
             {id: 3, name: "General Surgery", subsystems: ["OP", "Wards"]},
@@ -105,7 +122,7 @@
         // Populate system dropdown
         function populateSystems() {
             const systemSelect = document.getElementById('system-select');
-            systems.forEach(system => {
+            window.systems.forEach(system => {
                 const option = document.createElement('option');
                 option.value = system.id;
                 option.textContent = `${system.id}. ${system.name}`;
@@ -119,7 +136,7 @@
                 subsystemSelect.innerHTML = '<option value="">Select Subsystem</option>';
                 
                 if (systemId) {
-                    const system = systems.find(s => s.id == systemId);
+                    const system = window.systems.find(s => s.id == systemId);
                     if (system && system.subsystems) {
                         system.subsystems.forEach(sub => {
                             const option = document.createElement('option');
@@ -132,18 +149,192 @@
             });
         }
 
+        // --------- Firebase-powered Script.js Logic ---------
+        import {
+            getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs
+        } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+        // Utility: get logged-in user from sessionStorage
+        function getLoggedInUsername() {
+            return sessionStorage.getItem('username');
+        }
+
+        // Greet user
+        async function greetUser() {
+            const username = getLoggedInUsername();
+            if (!username) return;
+            const userRef = doc(window.db, "users", username);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists() && document.getElementById('greeting')) {
+                const user = userSnap.data();
+                document.getElementById('greeting').innerHTML =
+                    `Welcome, Dr. ${user.fullname}<br>Phone: ${user.phone}`;
+                document.getElementById('doctor-credentials').innerText = `Dr. ${user.fullname}`;
+            }
+        }
+
+        // Show assignment info
+        async function showAssignmentInfo() {
+            const username = getLoggedInUsername();
+            if (!username) return;
+            const assignmentsCol = collection(window.db, "assignments");
+            const assignmentsSnap = await getDocs(assignmentsCol);
+
+            let assigned = false;
+            let assignedSystem = '', assignedSubsystem = '', assignedSystemId = '';
+
+            for (const docSnap of assignmentsSnap.docs) {
+                const data = docSnap.data();
+                if (data.users && data.users.some(u => u.username === username)) {
+                    assigned = true;
+                    const [sysId, sub] = docSnap.id.split('_');
+                    assignedSystemId = sysId;
+                    assignedSystem = window.systems.find(s => s.id == sysId) ? window.systems.find(s => s.id == sysId).name : sysId;
+                    assignedSubsystem = sub;
+                    break;
+                }
+            }
+
+            const assignmentDiv = document.getElementById('assignment-info');
+            const formSection = document.getElementById('form-section');
+
+            if (assigned) {
+                if (formSection) formSection.style.display = 'none';
+                assignmentDiv.innerHTML = `
+                  You are assigned to:<br>
+                  System: ${assignedSystem}<br>
+                  Subsystem: ${assignedSubsystem}<br>
+                  <button id="leave-btn">Leave</button>
+                `;
+                document.getElementById('leave-btn').onclick = function() {
+                    leaveAssignment(assignedSystemId, assignedSubsystem, username);
+                };
+            } else {
+                if (formSection) formSection.style.display = '';
+                assignmentDiv.innerHTML = '';
+            }
+        }
+
+        // Assignment submit
+        async function submitAssignment() {
+            const systemId = document.getElementById('system-select').value;
+            const subsystem = document.getElementById('subsystem-select').value;
+            const msg = document.getElementById('success-message');
+            msg.textContent = "";
+
+            if (!systemId || !subsystem) {
+                msg.style.color = "#c0392b";
+                msg.innerText = "Please select both system and subsystem!";
+                return;
+            }
+
+            const username = getLoggedInUsername();
+            const userRef = doc(window.db, "users", username);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                msg.style.color = "#c0392b";
+                msg.innerText = "User not found!";
+                return;
+            }
+            const user = userSnap.data();
+
+            // Remove user from all previous assignments
+            const assignmentsCol = collection(window.db, "assignments");
+            const assignmentsSnap = await getDocs(assignmentsCol);
+            for (const docSnap of assignmentsSnap.docs) {
+                const data = docSnap.data();
+                if (data.users && data.users.some(u => u.username === username)) {
+                    await updateDoc(doc(window.db, "assignments", docSnap.id), {
+                        users: arrayRemove({ fullname: user.fullname, phone: user.phone, username: username })
+                    });
+                }
+            }
+
+            // Assign to new system/subsystem
+            const assignmentId = `${systemId}_${subsystem}`;
+            const assignmentRef = doc(window.db, "assignments", assignmentId);
+            const assignmentSnap = await getDoc(assignmentRef);
+
+            if (assignmentSnap.exists()) {
+                const data = assignmentSnap.data();
+                if (data.users && data.users.some(u => u.username === username)) {
+                    msg.style.color = "#c0392b";
+                    msg.innerText = "You are already assigned to this subsystem.";
+                    return;
+                }
+                await updateDoc(assignmentRef, {
+                    users: arrayUnion({ fullname: user.fullname, phone: user.phone, username: username })
+                });
+            } else {
+                await setDoc(assignmentRef, {
+                    users: [{ fullname: user.fullname, phone: user.phone, username: username }]
+                });
+            }
+
+            msg.style.color = "#27ae60";
+            msg.innerText = "Assignment successful!";
+            setTimeout(() => {
+                msg.innerText = "";
+                showAssignmentInfo();
+            }, 700);
+        }
+
+        // Leave assignment
+        async function leaveAssignment(systemId, subsystem, username) {
+            const assignmentId = `${systemId}_${subsystem}`;
+            const assignmentRef = doc(window.db, "assignments", assignmentId);
+
+            // Get user data
+            const userRef = doc(window.db, "users", username);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) return;
+            const user = userSnap.data();
+
+            await updateDoc(assignmentRef, {
+                users: arrayRemove({ fullname: user.fullname, phone: user.phone, username: username })
+            });
+
+            const msg = document.getElementById('success-message');
+            msg.style.color = "#c0392b";
+            msg.innerText = "You have left the subsystem.";
+            setTimeout(() => {
+                msg.innerText = "";
+                showAssignmentInfo();
+            }, 1000);
+        }
+
+        // Logout
+        function logout() {
+            sessionStorage.removeItem('loggedIn');
+            sessionStorage.removeItem('username');
+            window.location.href = 'login.html';
+        }
+
+        // Page Initialization
+        async function initFormPage() {
+            await greetUser();
+            populateSystems();
+            await showAssignmentInfo();
+        }
+
         // Check if user is logged in, redirect if not
         document.addEventListener('DOMContentLoaded', function() {
-            const loggedIn = localStorage.getItem('loggedIn');
-            const username = localStorage.getItem('username');
+            const loggedIn = sessionStorage.getItem('loggedIn');
+            const username = sessionStorage.getItem('username');
             if (!loggedIn || !username) {
                 window.location.href = 'login.html';
                 return;
             }
-            
+            // Attach event listeners
+            document.getElementById('logout-btn').addEventListener('click', logout);
+            document.getElementById('assignment-submit-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                submitAssignment();
+            });
             // Initialize page
             initFormPage();
         });
     </script>
 </body>
 </html>
+
