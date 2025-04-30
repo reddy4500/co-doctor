@@ -1,3 +1,20 @@
+// Firebase App (the core Firebase SDK) is always required and must be listed first
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
+  authDomain: "riims-45a22.firebaseapp.com",
+  projectId: "riims-45a22",
+  storageBucket: "riims-45a22.appspot.com",
+  messagingSenderId: "65833594122",
+  appId: "1:65833594122:web:7ef63f955aff3bbd09def3",
+  measurementId: "G-HH550FMYZQ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 // ----------- User Registration -----------
 function register() {
     const fullname = document.getElementById('reg-fullname').value.trim();
