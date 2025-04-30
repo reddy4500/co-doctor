@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <title>Doctors Availability | CO-DOCTOR</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
+        authDomain: "riims-45a22.firebaseapp.com",
+        projectId: "riims-45a22",
+        storageBucket: "riims-45a22.appspot.com",
+        messagingSenderId: "65833594122",
+        appId: "1:65833594122:web:7ef63f955aff3bbd09def3",
+        measurementId: "G-HH550FMYZQ"
+      };
+      window.firebaseApp = initializeApp(firebaseConfig);
+      window.db = getFirestore(window.firebaseApp);
+    </script>
 </head>
 <body>
     <!-- Navbar -->
@@ -19,7 +35,7 @@
         </ul>
         <div class="navbar-right">
             <span id="doctor-credentials"></span>
-            <button class="logout-btn" id="logout-btn" style="display:none;" onclick="logout()">Logout</button>
+            <button class="logout-btn" id="logout-btn" style="display:none;">Logout</button>
         </div>
     </nav>
 
@@ -29,8 +45,9 @@
         <div class="system-grid" id="system-grid"></div>
     </section>
 
-    <script src="script.js"></script>
-    <script>
+    <script type="module">
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
         // Systems data
         const systems = [
             {id: 1, name: "Respiratory Medicine (Pulmo)", subsystems: ["RICU", "TB and exam ward", "OP", "Casualty"]},
@@ -82,28 +99,51 @@
             });
         }
 
-        // Check login status and update UI
-        document.addEventListener('DOMContentLoaded', function() {
-            renderSystems();
-            
-            // Show/hide login/logout buttons based on login status
-            const loggedIn = localStorage.getItem('loggedIn');
-            const username = localStorage.getItem('username');
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            const user = users[username];
-            
+        // Show/hide login/logout and doctor credentials
+        async function updateNavBar() {
             const loginLink = document.getElementById('login-link');
             const logoutBtn = document.getElementById('logout-btn');
             const credentials = document.getElementById('doctor-credentials');
-            
-            if (loggedIn && user) {
-                if (loginLink) loginLink.parentElement.style.display = 'none';
-                if (logoutBtn) logoutBtn.style.display = '';
-                if (credentials) credentials.innerHTML = `Dr. <b>${user.fullname || username}</b> | <span>${user.phone || 'N/A'}</span>`;
+            const username = sessionStorage.getItem('username');
+            const loggedIn = sessionStorage.getItem('loggedIn');
+
+            if (loggedIn && username) {
+                // Fetch user from Firestore
+                const userRef = doc(window.db, "users", username);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const user = userSnap.data();
+                    if (loginLink) loginLink.parentElement.style.display = 'none';
+                    if (logoutBtn) logoutBtn.style.display = '';
+                    if (credentials) credentials.innerHTML = `Dr. <b>${user.fullname || username}</b> | <span>${user.phone || 'N/A'}</span>`;
+                } else {
+                    // If user not found, treat as logged out
+                    if (loginLink) loginLink.parentElement.style.display = '';
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+                    if (credentials) credentials.innerHTML = '';
+                }
             } else {
                 if (loginLink) loginLink.parentElement.style.display = '';
                 if (logoutBtn) logoutBtn.style.display = 'none';
                 if (credentials) credentials.innerHTML = '';
+            }
+        }
+
+        // Logout function
+        function logout() {
+            sessionStorage.removeItem('loggedIn');
+            sessionStorage.removeItem('username');
+            window.location.href = 'login.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderSystems();
+            updateNavBar();
+
+            // Attach logout
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
             }
         });
     </script>
