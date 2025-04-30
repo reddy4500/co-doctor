@@ -131,7 +131,7 @@ body {
 
 /* ====== SUBSYSTEM & DOCTOR DISPLAY ====== */
 .subsystem-list {
-  width: 100%;
+  width: 50%;
   margin-top: 15px;
   background: #e6f0ff;
   border-radius: 12px;
