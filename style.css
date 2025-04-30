@@ -131,7 +131,7 @@ body {
 
 /* ====== SUBSYSTEM & DOCTOR DISPLAY ====== */
 .subsystem-list {
-  width: 50%;
+  width: 100%;
   margin-top: 15px;
   background: #e6f0ff;
   border-radius: 12px;
@@ -157,7 +157,7 @@ body {
   margin: 5px 0;
   background: #f8f9fa;
   border-radius: 4px;
-  font-size: 1.1em;
+  font-size: 1.3em;
 }
 
 .doctor-name {
@@ -167,7 +167,7 @@ body {
 
 .doctor-phone {
   color: #7f8c8d;
-  font-size: 1.1em;
+  font-size: 1.3em;
 }
 
 .no-assignments {
