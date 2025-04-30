@@ -1,6 +1,8 @@
-// ====== Firebase Initialization ======
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs } from "firebase/firestore";
+// ====== FIREBASE SETUP ======
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs
+} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
@@ -11,17 +13,17 @@ const firebaseConfig = {
   appId: "1:65833594122:web:7ef63f955aff3bbd09def3",
   measurementId: "G-HH550FMYZQ"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ====== User Registration ======
-async function register() {
+// ----------- User Registration -----------
+export async function register() {
   const fullname = document.getElementById('reg-fullname').value.trim();
   const phone = document.getElementById('reg-phone').value.trim();
   const username = document.getElementById('reg-username').value.trim();
   const password = document.getElementById('reg-password').value.trim();
   const errorElem = document.getElementById('register-error');
+  errorElem.innerText = "";
 
   if (!fullname || !phone || !username || !password) {
     errorElem.style.color = "red";
@@ -43,9 +45,9 @@ async function register() {
   }
 
   await setDoc(userRef, {
-    password: password,
-    fullname: fullname,
-    phone: phone
+    fullname,
+    phone,
+    password
   });
 
   errorElem.style.color = "green";
@@ -55,11 +57,12 @@ async function register() {
   }, 1200);
 }
 
-// ====== User Login ======
-async function login() {
+// ----------- User Login -----------
+export async function login() {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
   const errorElem = document.getElementById('login-error');
+  errorElem.innerText = "";
 
   const userRef = doc(db, "users", username);
   const userSnap = await getDoc(userRef);
@@ -74,17 +77,17 @@ async function login() {
   }
 }
 
-// ====== Logout ======
-function logout() {
+// ----------- Logout -----------
+export function logout() {
   sessionStorage.removeItem('loggedIn');
   sessionStorage.removeItem('username');
   window.location.href = 'login.html';
 }
 
-// ====== Assignment Functions ======
+// ----------- Assignment Functions -----------
 
 // Assign user to system/subsystem
-async function submitAssignment() {
+export async function submitAssignment() {
   const systemId = document.getElementById('system-select').value;
   const subsystem = document.getElementById('subsystem-select').value;
   const msg = document.getElementById('success-message');
@@ -148,7 +151,7 @@ async function submitAssignment() {
 }
 
 // Remove user from their assignment
-async function leaveAssignment(systemId, subsystem, username) {
+export async function leaveAssignment(systemId, subsystem, username) {
   const assignmentId = `${systemId}_${subsystem}`;
   const assignmentRef = doc(db, "assignments", assignmentId);
 
@@ -172,7 +175,7 @@ async function leaveAssignment(systemId, subsystem, username) {
 }
 
 // Display the user's current assignment and show "Leave" button
-async function showAssignmentInfo() {
+export async function showAssignmentInfo() {
   const username = sessionStorage.getItem('username');
   const assignmentsCol = collection(db, "assignments");
   const assignmentsSnap = await getDocs(assignmentsCol);
@@ -212,8 +215,8 @@ async function showAssignmentInfo() {
   }
 }
 
-// ====== Greeting on Form Page ======
-async function greetUser() {
+// ----------- Greeting on Form Page -----------
+export async function greetUser() {
   const username = sessionStorage.getItem('username');
   const userRef = doc(db, "users", username);
   const userSnap = await getDoc(userRef);
@@ -224,14 +227,14 @@ async function greetUser() {
   }
 }
 
-// ====== Page Initialization (for form.html) ======
-async function initFormPage() {
+// ----------- Page Initialization -----------
+export async function initFormPage() {
   await greetUser();
   if (typeof populateSystems === "function") populateSystems();
   await showAssignmentInfo();
 }
 
-// ====== Event Listeners for Buttons (Attach after DOM load) ======
+// ----------- Event Listeners for Buttons -----------
 document.addEventListener('DOMContentLoaded', function () {
   // Register page
   if (document.getElementById('register-btn')) {
