@@ -132,54 +132,89 @@ body {
 /* ====== SUBSYSTEM & DOCTOR DISPLAY ====== */
 .subsystem-list {
     width: 100%;
-    margin-top: 15px;
+    margin-top: 24px;
     background: #e6f0ff;
-    border-radius: 12px;
-    padding: 15px;
+    border-radius: 16px;
+    padding: 32px 0;
     display: flex;
     flex-direction: column;
-    align-items: center;  /* <-- Add this line to center children horizontally */
+    align-items: center; /* Center all subsystem-item children */
+    box-shadow: 0 8px 24px 0 rgba(0, 51, 102, 0.08);
 }
 
 .subsystem-item {
-  margin-bottom: 12px;
-  padding: 10px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    width: 90%;
+    max-width: 500px;
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: box-shadow 0.2s;
+}
+.subsystem-item:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
 }
 
 .subsystem-header {
-  color: #003366;
-  font-weight: 700;
-  margin-bottom: 8px;
-  text-align: center;
+    color: #003366;
+    font-weight: 700;
+    margin-bottom: 12px;
+    font-size: 1.3em;
+    letter-spacing: 1px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.doctors-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .doctor-card {
-  padding: 8px;
-  margin: 5px 0;
-  background: #f8f9fa;
-  border-radius: 4px;
-  font-size: 1.3em;
-  align-items: center;
+    width: 100%;
+    max-width: 360px;
+    padding: 14px 18px;
+    margin: 8px 0;
+    background: linear-gradient(90deg, #e6f0ff 0%, #f8f9fa 100%);
+    border-radius: 8px;
+    font-size: 1.1em;
+    box-shadow: 0 2px 8px rgba(0,51,102,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: box-shadow 0.2s;
+}
+.doctor-card:hover {
+    box-shadow: 0 6px 24px rgba(0,51,102,0.13);
+    background: linear-gradient(90deg, #d0e6ff 0%, #f4f7fb 100%);
 }
 
 .doctor-name {
-  font-weight: 700;
-  color: #2c3e50;
-  align-items: center;
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 1.15em;
+    margin-bottom: 3px;
+    text-align: center;
 }
 
 .doctor-phone {
-  color: #7f8c8d;
-  font-size: 1.3em;
-  align-items: center;
+    color: #0077b6;
+    font-size: 1em;
+    text-align: center;
 }
 
 .no-assignments {
-  color: #95a5a6;
-  font-style: italic;
+    color: #b0b0b0;
+    font-size: 1.1em;
+    margin: 12px 0 0 0;
+    text-align: center;
+    font-style: italic;
 }
 
 /* ====== FORM STYLES ====== */
