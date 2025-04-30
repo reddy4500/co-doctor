@@ -17,7 +17,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // ----------- User Registration -----------
-export async function register() {
+async function register() {
   const fullname = document.getElementById('reg-fullname').value.trim();
   const phone = document.getElementById('reg-phone').value.trim();
   const username = document.getElementById('reg-username').value.trim();
@@ -44,21 +44,14 @@ export async function register() {
     return;
   }
 
-  await setDoc(userRef, {
-    fullname,
-    phone,
-    password
-  });
-
+  await setDoc(userRef, { fullname, phone, password });
   errorElem.style.color = "green";
   errorElem.innerText = "Registration successful! Redirecting to login...";
-  setTimeout(() => {
-    window.location.href = 'login.html';
-  }, 1200);
+  setTimeout(() => { window.location.href = 'login.html'; }, 1200);
 }
 
 // ----------- User Login -----------
-export async function login() {
+async function login() {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
   const errorElem = document.getElementById('login-error');
@@ -78,7 +71,7 @@ export async function login() {
 }
 
 // ----------- Logout -----------
-export function logout() {
+function logout() {
   sessionStorage.removeItem('loggedIn');
   sessionStorage.removeItem('username');
   window.location.href = 'login.html';
@@ -87,7 +80,7 @@ export function logout() {
 // ----------- Assignment Functions -----------
 
 // Assign user to system/subsystem
-export async function submitAssignment() {
+async function submitAssignment() {
   const systemId = document.getElementById('system-select').value;
   const subsystem = document.getElementById('subsystem-select').value;
   const msg = document.getElementById('success-message');
@@ -127,12 +120,6 @@ export async function submitAssignment() {
   const assignmentSnap = await getDoc(assignmentRef);
 
   if (assignmentSnap.exists()) {
-    const data = assignmentSnap.data();
-    if (data.users && data.users.some(u => u.username === username)) {
-      msg.style.color = "#c0392b";
-      msg.innerText = "You are already assigned to this subsystem.";
-      return;
-    }
     await updateDoc(assignmentRef, {
       users: arrayUnion({ fullname: user.fullname, phone: user.phone, username: username })
     });
@@ -151,7 +138,7 @@ export async function submitAssignment() {
 }
 
 // Remove user from their assignment
-export async function leaveAssignment(systemId, subsystem, username) {
+async function leaveAssignment(systemId, subsystem, username) {
   const assignmentId = `${systemId}_${subsystem}`;
   const assignmentRef = doc(db, "assignments", assignmentId);
 
@@ -175,7 +162,7 @@ export async function leaveAssignment(systemId, subsystem, username) {
 }
 
 // Display the user's current assignment and show "Leave" button
-export async function showAssignmentInfo() {
+async function showAssignmentInfo() {
   const username = sessionStorage.getItem('username');
   const assignmentsCol = collection(db, "assignments");
   const assignmentsSnap = await getDocs(assignmentsCol);
@@ -216,7 +203,7 @@ export async function showAssignmentInfo() {
 }
 
 // ----------- Greeting on Form Page -----------
-export async function greetUser() {
+async function greetUser() {
   const username = sessionStorage.getItem('username');
   const userRef = doc(db, "users", username);
   const userSnap = await getDoc(userRef);
@@ -228,7 +215,7 @@ export async function greetUser() {
 }
 
 // ----------- Page Initialization -----------
-export async function initFormPage() {
+async function initFormPage() {
   await greetUser();
   if (typeof populateSystems === "function") populateSystems();
   await showAssignmentInfo();
@@ -269,3 +256,4 @@ document.addEventListener('DOMContentLoaded', function () {
     initFormPage();
   }
 });
+
