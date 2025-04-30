@@ -30,8 +30,24 @@
         <div class="subsystem-list" id="subsystem-list"></div>
     </section>
 
-    <script src="script.js"></script>
-    <script>
+    <!-- Firestore-based script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
+            authDomain: "riims-45a22.firebaseapp.com",
+            projectId: "riims-45a22",
+            storageBucket: "riims-45a22.appspot.com",
+            messagingSenderId: "65833594122",
+            appId: "1:65833594122:web:7ef63f955aff3bbd09def3",
+            measurementId: "G-HH550FMYZQ"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         // Systems data
         const systems = [
             {id: 1, name: "Respiratory Medicine (Pulmo)", subsystems: ["RICU", "TB and exam ward", "OP", "Casualty"]},
@@ -74,54 +90,63 @@
             return urlParams.get(param);
         }
 
+        // Fetch doctors from Firestore for a subsystem
+        async function getDoctorsForSubsystem(systemId, subsystem) {
+            const assignmentId = `${systemId}_${subsystem}`;
+            const assignmentRef = doc(db, "assignments", assignmentId);
+            const assignmentSnap = await getDoc(assignmentRef);
+            if (assignmentSnap.exists()) {
+                return assignmentSnap.data().users || [];
+            }
+            return [];
+        }
+
         // Display system details and assignments
-        function displaySystemDetails() {
+        async function displaySystemDetails() {
             const systemId = getUrlParam('system');
             if (!systemId) {
                 window.location.href = 'index.html';
                 return;
             }
-            
+
             const system = systems.find(s => s.id == systemId);
             if (!system) {
                 window.location.href = 'index.html';
                 return;
             }
-            
-            // Set system name
+
             document.getElementById('system-name').textContent = `${system.id}. ${system.name}`;
-            
-            // Get assignments from localStorage
-            const assignments = JSON.parse(localStorage.getItem('assignments') || '{}');
             const subsystemList = document.getElementById('subsystem-list');
-            
-            // Display subsystems and their assignments
-            system.subsystems.forEach(subsystem => {
+            subsystemList.innerHTML = '';
+
+            for (const subsystem of system.subsystems) {
                 const subsystemItem = document.createElement('div');
                 subsystemItem.className = 'subsystem-item';
-                
+
                 const subsystemHeader = document.createElement('div');
                 subsystemHeader.className = 'subsystem-header';
                 subsystemHeader.textContent = subsystem;
                 subsystemItem.appendChild(subsystemHeader);
-                
-                // Add doctors assigned to this subsystem
+
                 const doctorsList = document.createElement('div');
                 doctorsList.className = 'doctors-list';
-                
-                if (assignments[systemId] && assignments[systemId][subsystem] && assignments[systemId][subsystem].length > 0) {
-                    assignments[systemId][subsystem].forEach(doctor => {
+
+                // Fetch doctors from Firestore
+                const doctors = await getDoctorsForSubsystem(systemId, subsystem);
+
+                if (doctors.length > 0) {
+                    doctors.forEach(doctor => {
                         const doctorCard = document.createElement('div');
                         doctorCard.className = 'doctor-card';
-                        
+
                         const doctorName = document.createElement('div');
                         doctorName.className = 'doctor-name';
                         doctorName.textContent = `Dr. ${doctor.fullname}`;
-                        
+
                         const doctorPhone = document.createElement('div');
                         doctorPhone.className = 'doctor-phone';
                         doctorPhone.textContent = `Phone: ${doctor.phone}`;
-                        
+
                         doctorCard.appendChild(doctorName);
                         doctorCard.appendChild(doctorPhone);
                         doctorsList.appendChild(doctorCard);
@@ -132,39 +157,18 @@
                     noAssignments.textContent = 'No doctors assigned yet';
                     doctorsList.appendChild(noAssignments);
                 }
-                
+
                 subsystemItem.appendChild(doctorsList);
                 subsystemList.appendChild(subsystemItem);
-            });
+            }
         }
 
-        // Check login status and update UI
         document.addEventListener('DOMContentLoaded', function() {
-            // Show system details
             displaySystemDetails();
-            
-            // Update login/logout buttons based on login status
-            const loggedIn = localStorage.getItem('loggedIn');
-            const username = localStorage.getItem('username');
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            const user = users[username];
-            
-            const loginBtn = document.getElementById('login-btn');
-            const logoutBtn = document.getElementById('logout-btn');
-            const credentials = document.getElementById('doctor-credentials');
-            
-            if (loggedIn && user) {
-                if (loginBtn) loginBtn.style.display = 'none';
-                if (logoutBtn) logoutBtn.style.display = '';
-                if (credentials) credentials.textContent = `Dr. ${user.fullname || username} | ${user.phone || 'N/A'}`;
-            } else {
-                if (loginBtn) loginBtn.style.display = '';
-                if (logoutBtn) logoutBtn.style.display = 'none';
-                if (credentials) credentials.textContent = '';
-            }
         });
     </script>
 </body>
 </html>
+
 
 
