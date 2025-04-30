@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <title>Login | CO-DOCTOR</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+      import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
+        authDomain: "riims-45a22.firebaseapp.com",
+        projectId: "riims-45a22",
+        storageBucket: "riims-45a22.appspot.com",
+        messagingSenderId: "65833594122",
+        appId: "1:65833594122:web:7ef63f955aff3bbd09def3",
+        measurementId: "G-HH550FMYZQ"
+      };
+      window.firebaseApp = initializeApp(firebaseConfig);
+      window.auth = getAuth(window.firebaseApp);
+    </script>
 </head>
 <body>
     <!-- Navbar -->
@@ -23,8 +39,8 @@
     <!-- Login Form -->
     <div class="form-container">
         <h2 class="text-center">Doctor Login</h2>
-        <form id="login-form" onsubmit="event.preventDefault(); login();">
-            <input type="text" id="username" placeholder="Username" required>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Username (Email)" required>
             <input type="password" id="password" placeholder="Password" required>
             <button type="submit" class="btn">Login</button>
         </form>
@@ -34,6 +50,34 @@
         </p>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module">
+      import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+      // Login form handler
+      document.getElementById('login-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const errorElem = document.getElementById('login-error');
+        errorElem.innerText = "";
+
+        try {
+          // Firebase Auth expects email as username
+          const userCredential = await signInWithEmailAndPassword(window.auth, username, password);
+          // Store login state in sessionStorage
+          sessionStorage.setItem('loggedIn', 'true');
+          sessionStorage.setItem('username', username);
+          window.location.href = 'form.html';
+        } catch (error) {
+          let msg = "Invalid credentials!";
+          if (error.code === 'auth/user-not-found') msg = "No such user found!";
+          else if (error.code === 'auth/wrong-password') msg = "Incorrect password!";
+          else if (error.code === 'auth/invalid-email') msg = "Invalid email format!";
+          errorElem.style.color = "red";
+          errorElem.innerText = msg;
+        }
+      });
+    </script>
 </body>
 </html>
+
