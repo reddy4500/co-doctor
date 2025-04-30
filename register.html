@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <title>Register | CO-DOCTOR</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
+        authDomain: "riims-45a22.firebaseapp.com",
+        projectId: "riims-45a22",
+        storageBucket: "riims-45a22.appspot.com",
+        messagingSenderId: "65833594122",
+        appId: "1:65833594122:web:7ef63f955aff3bbd09def3",
+        measurementId: "G-HH550FMYZQ"
+      };
+      window.firebaseApp = initializeApp(firebaseConfig);
+      window.db = getFirestore(window.firebaseApp);
+    </script>
 </head>
 <body>
     <!-- Navbar -->
@@ -23,7 +39,7 @@
     <!-- Registration Form -->
     <div class="form-container">
         <h2 class="text-center">Register</h2>
-        <form id="registration-form" onsubmit="event.preventDefault(); register();">
+        <form id="registration-form">
             <input type="text" id="reg-fullname" placeholder="Full Name" required>
             <input type="tel" id="reg-phone" placeholder="Phone Number (10 digits)" required pattern="[0-9]{10}">
             <input type="text" id="reg-username" placeholder="Username" required>
@@ -36,6 +52,53 @@
         </p>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module">
+      import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+      document.getElementById('registration-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const fullname = document.getElementById('reg-fullname').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const username = document.getElementById('reg-username').value.trim();
+        const password = document.getElementById('reg-password').value.trim();
+        const errorElem = document.getElementById('register-error');
+        errorElem.innerText = "";
+
+        // Validation
+        if (!fullname || !phone || !username || !password) {
+          errorElem.style.color = "red";
+          errorElem.innerText = "Please fill in all fields.";
+          return;
+        }
+        if (!/^\d{10}$/.test(phone)) {
+          errorElem.style.color = "red";
+          errorElem.innerText = "Please enter a valid 10-digit phone number.";
+          return;
+        }
+
+        // Check if user exists
+        const userRef = doc(window.db, "users", username);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          errorElem.style.color = "red";
+          errorElem.innerText = "Username already exists. Please choose another.";
+          return;
+        }
+
+        // Save user to Firestore
+        await setDoc(userRef, {
+          fullname: fullname,
+          phone: phone,
+          password: password
+        });
+
+        errorElem.style.color = "green";
+        errorElem.innerText = "Registration successful! Redirecting to login...";
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1200);
+      });
+    </script>
 </body>
 </html>
+
