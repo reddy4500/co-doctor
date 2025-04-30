@@ -153,6 +153,7 @@ body {
   color: #003366;
   font-weight: 600;
   margin-bottom: 8px;
+  text-align: center;
 }
 
 .doctor-card {
@@ -161,16 +162,25 @@ body {
   background: #f8f9fa;
   border-radius: 4px;
   font-size: 1.3em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* <-- Add this line */
 }
 
 .doctor-name {
   font-weight: 500;
   color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .doctor-phone {
   color: #7f8c8d;
   font-size: 1.3em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .no-assignments {
