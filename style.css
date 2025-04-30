@@ -157,7 +157,7 @@ body {
   margin: 5px 0;
   background: #f8f9fa;
   border-radius: 4px;
-  font-size: 0.95em;
+  font-size: 1.1em;
 }
 
 .doctor-name {
@@ -167,7 +167,7 @@ body {
 
 .doctor-phone {
   color: #7f8c8d;
-  font-size: 0.9em;
+  font-size: 1.1em;
 }
 
 .no-assignments {
