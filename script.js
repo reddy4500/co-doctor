@@ -1,4 +1,4 @@
-// Firebase App (the core Firebase SDK) is always required and must be listed first
+// ====== Firebase Initialization ======
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs } from "firebase/firestore";
 
@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ----------- User Registration -----------
+// ====== User Registration ======
 async function register() {
   const fullname = document.getElementById('reg-fullname').value.trim();
   const phone = document.getElementById('reg-phone').value.trim();
@@ -34,7 +34,6 @@ async function register() {
     return;
   }
 
-  // Check if user exists in Firestore
   const userRef = doc(db, "users", username);
   const userSnap = await getDoc(userRef);
   if (userSnap.exists()) {
@@ -43,7 +42,6 @@ async function register() {
     return;
   }
 
-  // Add user to Firestore
   await setDoc(userRef, {
     password: password,
     fullname: fullname,
@@ -57,8 +55,7 @@ async function register() {
   }, 1200);
 }
 
-
-// ----------- User Login -----------
+// ====== User Login ======
 async function login() {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
@@ -77,15 +74,14 @@ async function login() {
   }
 }
 
-
-// ----------- Logout -----------
+// ====== Logout ======
 function logout() {
   sessionStorage.removeItem('loggedIn');
   sessionStorage.removeItem('username');
   window.location.href = 'login.html';
 }
 
-// ----------- Assignment Functions -----------
+// ====== Assignment Functions ======
 
 // Assign user to system/subsystem
 async function submitAssignment() {
@@ -149,36 +145,6 @@ async function submitAssignment() {
     msg.innerText = "";
     showAssignmentInfo();
   }, 700);
-}
-
-    // Remove user from previous assignments
-    for (const sysId in assignments) {
-        for (const sub in assignments[sysId]) {
-            assignments[sysId][sub] = assignments[sysId][sub].filter(u => u.username !== username);
-        }
-    }
-
-    if (!assignments[systemId]) assignments[systemId] = {};
-    if (!assignments[systemId][subsystem]) assignments[systemId][subsystem] = [];
-
-    // Prevent duplicate assignment
-    if (!assignments[systemId][subsystem].some(u => u.username === username)) {
-        assignments[systemId][subsystem].push({
-            fullname: user.fullname,
-            phone: user.phone,
-            username: username
-        });
-        localStorage.setItem('assignments', JSON.stringify(assignments));
-        msg.style.color = "#27ae60";
-        msg.innerText = "Assignment successful!";
-        setTimeout(() => {
-            msg.innerText = "";
-            showAssignmentInfo();
-        }, 700);
-    } else {
-        msg.style.color = "#c0392b";
-        msg.innerText = "You are already assigned to this subsystem.";
-    }
 }
 
 // Remove user from their assignment
@@ -246,7 +212,7 @@ async function showAssignmentInfo() {
   }
 }
 
-// ----------- Greeting on Form Page -----------
+// ====== Greeting on Form Page ======
 async function greetUser() {
   const username = sessionStorage.getItem('username');
   const userRef = doc(db, "users", username);
@@ -258,10 +224,45 @@ async function greetUser() {
   }
 }
 
-// ----------- Page Initialization -----------
+// ====== Page Initialization (for form.html) ======
 async function initFormPage() {
   await greetUser();
   if (typeof populateSystems === "function") populateSystems();
   await showAssignmentInfo();
 }
 
+// ====== Event Listeners for Buttons (Attach after DOM load) ======
+document.addEventListener('DOMContentLoaded', function () {
+  // Register page
+  if (document.getElementById('register-btn')) {
+    document.getElementById('register-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      register();
+    });
+  }
+  // Login page
+  if (document.getElementById('login-btn')) {
+    document.getElementById('login-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      login();
+    });
+  }
+  // Form page (assignment submit)
+  if (document.getElementById('assignment-submit-btn')) {
+    document.getElementById('assignment-submit-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      submitAssignment();
+    });
+  }
+  // Logout button (if present)
+  if (document.getElementById('logout-btn')) {
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      logout();
+    });
+  }
+  // Form page initialization
+  if (typeof initFormPage === "function" && document.getElementById('form-section')) {
+    initFormPage();
+  }
+});
