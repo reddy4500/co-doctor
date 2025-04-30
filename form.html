@@ -22,306 +22,188 @@
             line-height: 1.5;
         }
     </style>
-    <!-- Firebase App (the core Firebase SDK) -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-      import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-      // Your web app's Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
-        authDomain: "riims-45a22.firebaseapp.com",
-        projectId: "riims-45a22",
-        storageBucket: "riims-45a22.appspot.com",
-        messagingSenderId: "65833594122",
-        appId: "1:65833594122:web:7ef63f955aff3bbd09def3",
-        measurementId: "G-HH550FMYZQ"
-      };
-      window.firebaseApp = initializeApp(firebaseConfig);
-      window.db = getFirestore(window.firebaseApp);
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
+            authDomain: "riims-45a22.firebaseapp.com",
+            projectId: "riims-45a22",
+            storageBucket: "riims-45a22.appspot.com",
+            messagingSenderId: "65833594122",
+            appId: "1:65833594122:web:7ef63f955aff3bbd09def3",
+            measurementId: "G-HH550FMYZQ"
+        };
+        window.firebaseApp = initializeApp(firebaseConfig);
+        window.db = getFirestore(window.firebaseApp);
     </script>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-left">
-            <img src="logo.jpeg" class="logo" alt="CO-DOCTOR Logo">
-            <span class="brand-name">CO-DOCTOR</span>
-        </div>
-        <ul class="navbar-center">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="system.html">Systems</a></li>
-            <li><a href="#" class="active">Assignment</a></li>
-        </ul>
-        <div class="navbar-right">
-            <span id="doctor-credentials"></span>
-            <button class="logout-btn" id="logout-btn">Logout</button>
-        </div>
-    </nav>
+<nav class="navbar">
+    <div class="navbar-left">
+        <img src="logo.jpeg" class="logo" alt="CO-DOCTOR Logo">
+        <span class="brand-name">CO-DOCTOR</span>
+    </div>
+    <ul class="navbar-center">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="system.html">Systems</a></li>
+        <li><a href="#" class="active">Assignment</a></li>
+    </ul>
+    <div class="navbar-right">
+        <span id="doctor-credentials"></span>
+        <button class="logout-btn" id="logout-btn">Logout</button>
+    </div>
+</nav>
 
-    <!-- Main Content -->
-    <section class="main-section">
-        <div class="dashboard-greeting">
-            <h1 id="greeting"></h1>
-        </div>
-        
-        <!-- Current Assignment Info -->
-        <div id="assignment-info"></div>
-        
-        <!-- Assignment Form -->
-        <div class="form-container" id="form-section">
-            <h2 class="text-center">Choose Your System</h2>
-            <select id="system-select">
+<section class="main-section">
+    <div class="dashboard-greeting">
+        <h1 id="greeting"></h1>
+    </div>
+
+    <div id="assignment-info"></div>
+
+    <div class="form-container" id="form-section">
+        <h2 class="text-center">Choose Your Systems</h2>
+
+        <div>
+            <h3>Primary Assignment</h3>
+            <select id="system-select-1">
                 <option value="">Select System</option>
             </select>
-            <select id="subsystem-select">
+            <select id="subsystem-select-1">
                 <option value="">Select Subsystem</option>
             </select>
-            <button class="btn" id="assignment-submit-btn">Submit</button>
-            <div id="success-message"></div>
         </div>
-    </section>
 
-    <!-- Systems Data and Script -->
-    <script type="module">
-        // Systems data
-        window.systems = [
-            {id: 1, name: "Respiratory Medicine", subsystems: ["RICU", "TB and exam ward", "OP", "Chest Ward","Sarri Ward","Respiratory Casualty"]},
-            {id: 2, name: "Pediatrics", subsystems: ["Wards", "PICU", "OP"]},
-            {id: 3, name: "Surgery", subsystems: ["Unit-1", "Unit-2", "Unit-3", "Unit-4"]},
-            {id: 4, name: "Radiology", subsystems: ["Morning-Night", "Afternoon"]},
-            {id: 5, name: "ENT", subsystems: ["ENT-Casualty", "Ward's"]},
-            {id: 6, name: "Orthopedics", subsystems: ["OP", "Ortho-Casualty"]},
-            {id: 7, name: "SPM (Community Medicine)", subsystems: ["Gudihatnur", "Khurshid Nagar", "SNC", "DTC", "Department"]},
-            {id: 8, name: "Casualty", subsystems: ["Medicine","Surgery","Pulmo","Ortho","ENT","Ophthal","Psychiatry","Anasthesia"]},
-            {id: 9, name: "Medicine", subsystems: ["MICU", "COTM", "ICCU", "MMW", "FMW", "OP"]},
-            {id: 10, name: "OBG", subsystems: ["Labour Room-Morning","Labour Room-Evening","Admissions","HDU","POW 1","POW 2","PNW","OP"]},
-            {id: 11, name: "Anaesthesia", subsystems: ["SS","Old Building","Full Duty"]},
-            {id: 12, name: "FMT", subsystems: ["FMT"]},
-            {id: 13, name: "Psychiatry", subsystems: ["Psychiatry"]},
-            {id: 14, name: "Dermotology", subsystems: ["Dermotology"]},
-            {id: 15, name: "Urology" , subsystems: ["Urology"]},
-            {id: 16, name: "Casualty Intern" , subsystems: ["8am-2pm","2pm-8pm","8pm-12am","8pm-8am"]},
-            {id: 17, name: "Opthal" , subsystems: ["OP","OT","Wards and Casualty"]},
-            {id: 18, name: "Plastic Surgery" , subsystems: ["Plastic Surgery"]},
-            {id: 19, name: "Oncology" , subsystems:["Oncology"]},
-        ];
+        <div>
+            <h3>Secondary Assignment</h3>
+            <select id="system-select-2">
+                <option value="">Select System</option>
+            </select>
+            <select id="subsystem-select-2">
+                <option value="">Select Subsystem</option>
+            </select>
+        </div>
 
-        // Populate system dropdown
-        function populateSystems() {
-            const systemSelect = document.getElementById('system-select');
-            window.systems.forEach(system => {
-                const option = document.createElement('option');
-                option.value = system.id;
-                option.textContent = `${system.id}. ${system.name}`;
-                systemSelect.appendChild(option);
-            });
-            
-            // Add event listener to populate subsystems when system is selected
-            systemSelect.addEventListener('change', function() {
-                const systemId = this.value;
-                const subsystemSelect = document.getElementById('subsystem-select');
-                subsystemSelect.innerHTML = '<option value="">Select Subsystem</option>';
-                
-                if (systemId) {
-                    const system = window.systems.find(s => s.id == systemId);
-                    if (system && system.subsystems) {
-                        system.subsystems.forEach(sub => {
-                            const option = document.createElement('option');
-                            option.value = sub;
-                            option.textContent = sub;
-                            subsystemSelect.appendChild(option);
-                        });
-                    }
-                }
-            });
-        }
+        <button class="btn" id="assignment-submit-btn">Submit</button>
+        <div id="success-message"></div>
+    </div>
+</section>
 
-        // --------- Firebase-powered Script.js Logic ---------
-        import {
-            getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs
-        } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+<script type="module">
+    import {
+        getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs
+    } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
-        // Utility: get logged-in user from sessionStorage
-        function getLoggedInUsername() {
-            return sessionStorage.getItem('username');
-        }
+    const systems = [
+        {id: 1, name: "Respiratory Medicine", subsystems: ["RICU", "TB and exam ward", "OP", "Chest Ward", "Sarri Ward", "Respiratory Casualty"]},
+        {id: 2, name: "Pediatrics", subsystems: ["Wards", "PICU", "OP"]},
+        {id: 3, name: "Surgery", subsystems: ["Unit-1", "Unit-2", "Unit-3", "Unit-4"]},
+        {id: 4, name: "Radiology", subsystems: ["Morning-Night", "Afternoon"]},
+        {id: 5, name: "ENT", subsystems: ["ENT-Casualty", "Ward's"]},
+        {id: 6, name: "Orthopedics", subsystems: ["OP", "Ortho-Casualty"]},
+        {id: 7, name: "SPM (Community Medicine)", subsystems: ["Gudihatnur", "Khurshid Nagar", "SNC", "DTC", "Department"]},
+        {id: 8, name: "Casualty", subsystems: ["Medicine", "Surgery", "Pulmo", "Ortho", "ENT", "Ophthal", "Psychiatry", "Anasthesia"]},
+        {id: 9, name: "Medicine", subsystems: ["MICU", "COTM", "ICCU", "MMW", "FMW", "OP"]},
+        {id: 10, name: "OBG", subsystems: ["Labour Room-Morning", "Labour Room-Evening", "Admissions", "HDU", "POW 1", "POW 2", "PNW", "OP"]},
+        {id: 11, name: "Anaesthesia", subsystems: ["SS", "Old Building", "Full Duty"]},
+        {id: 12, name: "FMT", subsystems: ["FMT"]},
+        {id: 13, name: "Psychiatry", subsystems: ["Psychiatry"]},
+        {id: 14, name: "Dermotology", subsystems: ["Dermotology"]},
+        {id: 15, name: "Urology", subsystems: ["Urology"]},
+        {id: 16, name: "Casualty Intern", subsystems: ["8am-2pm", "2pm-8pm", "8pm-12am", "8pm-8am"]},
+        {id: 17, name: "Opthal", subsystems: ["OP", "OT", "Wards and Casualty"]},
+        {id: 18, name: "Plastic Surgery", subsystems: ["Plastic Surgery"]},
+        {id: 19, name: "Oncology", subsystems:["Oncology"]},
+    ];
 
-        // Greet user
-        async function greetUser() {
-            const username = getLoggedInUsername();
-            if (!username) return;
-            const userRef = doc(window.db, "users", username);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists() && document.getElementById('greeting')) {
-                const user = userSnap.data();
-                document.getElementById('greeting').innerHTML =
-                    `Welcome, Dr. ${user.fullname}<br>Phone: ${user.phone}`;
-                document.getElementById('doctor-credentials').innerText = `Dr. ${user.fullname}`;
+    function populateSelect(systemSelectId, subsystemSelectId) {
+        const systemSelect = document.getElementById(systemSelectId);
+        const subsystemSelect = document.getElementById(subsystemSelectId);
+
+        systems.forEach(system => {
+            const option = document.createElement('option');
+            option.value = system.id;
+            option.textContent = `${system.id}. ${system.name}`;
+            systemSelect.appendChild(option);
+        });
+
+        systemSelect.addEventListener('change', function() {
+            const system = systems.find(s => s.id == this.value);
+            subsystemSelect.innerHTML = '<option value="">Select Subsystem</option>';
+            if (system) {
+                system.subsystems.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subsystemSelect.appendChild(option);
+                });
             }
+        });
+    }
+
+    async function submitAssignment() {
+        const s1 = document.getElementById('system-select-1').value;
+        const ss1 = document.getElementById('subsystem-select-1').value;
+        const s2 = document.getElementById('system-select-2').value;
+        const ss2 = document.getElementById('subsystem-select-2').value;
+        const msg = document.getElementById('success-message');
+        msg.innerText = "";
+
+        if ((!s1 || !ss1) && (!s2 || !ss2)) {
+            msg.style.color = "#c0392b";
+            msg.innerText = "At least one system and subsystem must be selected.";
+            return;
         }
 
-        // Show assignment info
-        async function showAssignmentInfo() {
-            const username = getLoggedInUsername();
-            if (!username) return;
-            const assignmentsCol = collection(window.db, "assignments");
-            const assignmentsSnap = await getDocs(assignmentsCol);
+        const username = sessionStorage.getItem('username');
+        const userRef = doc(window.db, "users", username);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) return;
+        const user = userSnap.data();
 
-            let assigned = false;
-            let assignedSystem = '', assignedSubsystem = '', assignedSystemId = '';
-
-            for (const docSnap of assignmentsSnap.docs) {
-                const data = docSnap.data();
-                if (data.users && data.users.some(u => u.username === username)) {
-                    assigned = true;
-                    const [sysId, sub] = docSnap.id.split('_');
-                    assignedSystemId = sysId;
-                    assignedSystem = window.systems.find(s => s.id == sysId) ? window.systems.find(s => s.id == sysId).name : sysId;
-                    assignedSubsystem = sub;
-                    break;
-                }
-            }
-
-            const assignmentDiv = document.getElementById('assignment-info');
-            const formSection = document.getElementById('form-section');
-
-            if (assigned) {
-                if (formSection) formSection.style.display = 'none';
-                assignmentDiv.innerHTML = `
-                  You are assigned to:<br>
-                  System: ${assignedSystem}<br>
-                  Subsystem: ${assignedSubsystem}<br>
-                  <button id="leave-btn">Leave</button>
-                `;
-                document.getElementById('leave-btn').onclick = function() {
-                    leaveAssignment(assignedSystemId, assignedSubsystem, username);
-                };
-            } else {
-                if (formSection) formSection.style.display = '';
-                assignmentDiv.innerHTML = '';
+        const assignmentsCol = collection(window.db, "assignments");
+        const assignmentsSnap = await getDocs(assignmentsCol);
+        for (const docSnap of assignmentsSnap.docs) {
+            const data = docSnap.data();
+            if (data.users?.some(u => u.username === username)) {
+                await updateDoc(doc(window.db, "assignments", docSnap.id), {
+                    users: arrayRemove({ fullname: user.fullname, phone: user.phone, username: username })
+                });
             }
         }
 
-        // Assignment submit
-        async function submitAssignment() {
-            const systemId = document.getElementById('system-select').value;
-            const subsystem = document.getElementById('subsystem-select').value;
-            const msg = document.getElementById('success-message');
-            msg.textContent = "";
-
-            if (!systemId || !subsystem) {
-                msg.style.color = "#c0392b";
-                msg.innerText = "Please select both system and subsystem!";
-                return;
-            }
-
-            const username = getLoggedInUsername();
-            const userRef = doc(window.db, "users", username);
-            const userSnap = await getDoc(userRef);
-            if (!userSnap.exists()) {
-                msg.style.color = "#c0392b";
-                msg.innerText = "User not found!";
-                return;
-            }
-            const user = userSnap.data();
-
-            // Remove user from all previous assignments
-            const assignmentsCol = collection(window.db, "assignments");
-            const assignmentsSnap = await getDocs(assignmentsCol);
-            for (const docSnap of assignmentsSnap.docs) {
-                const data = docSnap.data();
-                if (data.users && data.users.some(u => u.username === username)) {
-                    await updateDoc(doc(window.db, "assignments", docSnap.id), {
-                        users: arrayRemove({ fullname: user.fullname, phone: user.phone, username: username })
-                    });
-                }
-            }
-
-            // Assign to new system/subsystem
-            const assignmentId = `${systemId}_${subsystem}`;
-            const assignmentRef = doc(window.db, "assignments", assignmentId);
-            const assignmentSnap = await getDoc(assignmentRef);
-
-            if (assignmentSnap.exists()) {
-                const data = assignmentSnap.data();
-                if (data.users && data.users.some(u => u.username === username)) {
-                    msg.style.color = "#c0392b";
-                    msg.innerText = "You are already assigned to this subsystem.";
-                    return;
-                }
-                await updateDoc(assignmentRef, {
+        const assign = async (id, sub) => {
+            if (!id || !sub) return;
+            const aid = `${id}_${sub}`;
+            const ref = doc(window.db, "assignments", aid);
+            const snap = await getDoc(ref);
+            if (snap.exists()) {
+                await updateDoc(ref, {
                     users: arrayUnion({ fullname: user.fullname, phone: user.phone, username: username })
                 });
             } else {
-                await setDoc(assignmentRef, {
+                await setDoc(ref, {
                     users: [{ fullname: user.fullname, phone: user.phone, username: username }]
                 });
             }
-
-            msg.style.color = "#27ae60";
-            msg.innerText = "Assignment successful!";
-            setTimeout(() => {
-                msg.innerText = "";
-                showAssignmentInfo();
-            }, 700);
         }
 
-        // Leave assignment
-        async function leaveAssignment(systemId, subsystem, username) {
-            const assignmentId = `${systemId}_${subsystem}`;
-            const assignmentRef = doc(window.db, "assignments", assignmentId);
+        await assign(s1, ss1);
+        await assign(s2, ss2);
 
-            // Get user data
-            const userRef = doc(window.db, "users", username);
-            const userSnap = await getDoc(userRef);
-            if (!userSnap.exists()) return;
-            const user = userSnap.data();
+        msg.style.color = "#27ae60";
+        msg.innerText = "Assignment successful!";
+    }
 
-            await updateDoc(assignmentRef, {
-                users: arrayRemove({ fullname: user.fullname, phone: user.phone, username: username })
-            });
+    function init() {
+        populateSelect('system-select-1', 'subsystem-select-1');
+        populateSelect('system-select-2', 'subsystem-select-2');
+        document.getElementById('assignment-submit-btn').addEventListener('click', submitAssignment);
+    }
 
-            const msg = document.getElementById('success-message');
-            msg.style.color = "#c0392b";
-            msg.innerText = "You have left the subsystem.";
-            setTimeout(() => {
-                msg.innerText = "";
-                showAssignmentInfo();
-            }, 1000);
-        }
-
-        // Logout
-        function logout() {
-            sessionStorage.removeItem('loggedIn');
-            sessionStorage.removeItem('username');
-            window.location.href = 'login.html';
-        }
-
-        // Page Initialization
-        async function initFormPage() {
-            await greetUser();
-            populateSystems();
-            await showAssignmentInfo();
-        }
-
-        // Check if user is logged in, redirect if not
-        document.addEventListener('DOMContentLoaded', function() {
-            const loggedIn = sessionStorage.getItem('loggedIn');
-            const username = sessionStorage.getItem('username');
-            if (!loggedIn || !username) {
-                window.location.href = 'login.html';
-                return;
-            }
-            // Attach event listeners
-            document.getElementById('logout-btn').addEventListener('click', logout);
-            document.getElementById('assignment-submit-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                submitAssignment();
-            });
-            // Initialize page
-            initFormPage();
-        });
-    </script>
+    document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
-
