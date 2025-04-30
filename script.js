@@ -1,9 +1,9 @@
-// ====== FIREBASE SETUP ======
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import {
   getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAUCDNMGGGRMjfq3_-2MY5P_rUMt6a7rfs",
   authDomain: "riims-45a22.firebaseapp.com",
@@ -256,4 +256,5 @@ document.addEventListener('DOMContentLoaded', function () {
     initFormPage();
   }
 });
+
 
