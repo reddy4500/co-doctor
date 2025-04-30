@@ -131,11 +131,14 @@ body {
 
 /* ====== SUBSYSTEM & DOCTOR DISPLAY ====== */
 .subsystem-list {
-  width: 100%;
-  margin-top: 15px;
-  background: #e6f0ff;
-  border-radius: 12px;
-  padding: 15px;
+    width: 100%;
+    margin-top: 15px;
+    background: #e6f0ff;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;  /* <-- Add this line to center children horizontally */
 }
 
 .subsystem-item {
