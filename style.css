@@ -103,31 +103,37 @@ body {
   gap: 30px;
   justify-content: center;
   margin-top: 40px;
+  padding: 0 20px; /* Optional: adds spacing on small screens */
 }
 
+/* Enhanced .system-box */
 .system-box {
-  background: #0188df;
+  background: linear-gradient(135deg, #0188df 0%, #00aaff 100%);
   color: #fff;
   border-radius: 18px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   width: 320px;
   min-height: 70px;
   margin-bottom: 10px;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
   padding: 24px 28px 18px 28px;
   font-size: 1.3em;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
+/* Hover effect */
 .system-box:hover {
-  background: #0056b3;
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  background: linear-gradient(135deg, #007acc 0%, #0099dd 100%);
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.15);
 }
+
 
 /* ====== SUBSYSTEM & DOCTOR DISPLAY ====== */
 .subsystem-list {
