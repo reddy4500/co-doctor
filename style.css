@@ -116,7 +116,7 @@ body {
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
   padding: 24px 28px 18px 28px;
-  font-size: 1.18em;
+  font-size: 1.3em;
   display: flex;
   flex-direction: column;
   align-items: center;
